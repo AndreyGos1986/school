@@ -6,11 +6,10 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+
 
 @RestController
-@RequestMapping("faculty")
+@RequestMapping("/faculty")
 public class FacultyController {
     private final FacultyService facultyService;
 
@@ -19,13 +18,13 @@ public class FacultyController {
     }
 
     @PostMapping
-    public Faculty createFaculty(Faculty faculty) { // create
-        return facultyService.createFaculty(faculty);
+    public ResponseEntity<Faculty> createFaculty( @RequestBody Faculty faculty) { // create
+        return ResponseEntity.ok(facultyService.createFaculty(faculty));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Map<Long, Faculty>> getAllFac() {
-        if (facultyService.getAllFac().values() != null) {
+    public ResponseEntity<Collection<Faculty>> getAllFac() {
+        if (facultyService.getAllFac().isEmpty() == false) {
             return ResponseEntity.ok(facultyService.getAllFac());
         } else return ResponseEntity.badRequest().build();
     }
@@ -40,12 +39,13 @@ public class FacultyController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<Faculty>> getFacByColor(@RequestParam String color) {
-        if (color != null) {
-            ResponseEntity.ok(facultyService.findByColor(color));
+    public ResponseEntity<Collection<Faculty>> getFacByColor(@RequestParam(value = "color", required = false) String color) {
+        if (color == null) {
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(Collections.emptyList());
+        return ResponseEntity.ok(facultyService.findByColor(color));
     }
+
 
     @PutMapping
     public ResponseEntity<Faculty> changeFaculty(@RequestBody Faculty changedFaculty) { //update
@@ -55,10 +55,12 @@ public class FacultyController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity <Faculty> removeFaculty(@PathVariable long id) { //delete
-       if (id>0) {
-           return ResponseEntity.ok(facultyService.removeFaculty(id));
-       } else return ResponseEntity.notFound().build();
+    public ResponseEntity removeFaculty(@PathVariable("id") long id) { //delete
+        if (id > 0) {
+            facultyService.removeFaculty(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 

@@ -22,16 +22,30 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudentInfo(@PathVariable long id) { // read
-        if (studentService.getAll().values() != null) {
-            return ResponseEntity.ok(studentService.getStudentFromStudentMapAtFaculty(id));
+    public ResponseEntity<Student> getStudent(@PathVariable long id) { // read
+        if (studentService.getAll().isEmpty() ==false) {
+            return ResponseEntity.ok(studentService.getStudent(id));
         } else {
             return ResponseEntity.badRequest().build();
         }
     }
 
+    @PutMapping
+    public ResponseEntity<Student> changeStudent(@RequestBody Student changedStudent) { //update
+        return ResponseEntity.ok(studentService.changeStudent(changedStudent));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity  removeStudent(@PathVariable long id) { //delete
+        if (id>0 && studentService.getAll().isEmpty()==false) {
+             return ResponseEntity.ok().build();
+        } else {
+            return  ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping
-    public ResponseEntity<ArrayList<Student>> getStudentsByAge(@RequestParam int age) {
+    public ResponseEntity<Collection<Student>> getStudentsByAge(@RequestParam int age) {
         if (age > 0 & studentService.findByAge(age) != null) {
             return ResponseEntity.ok(studentService.findByAge(age));
         } else {
@@ -40,26 +54,13 @@ public class StudentController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Map<Long, Student>> getAllStudents() {
-        if (studentService.getAll().values() != null) {
+    public ResponseEntity<Collection< Student>> getAllStudents() {
+        if (studentService.getAll().isEmpty()== false) {
             return ResponseEntity.ok(studentService.getAll());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @PutMapping
-    public ResponseEntity<Student> changeStudent(@RequestBody Student changedStudent) { //update
-        return ResponseEntity.ok(studentService.changeStudentAtStudentMapAtFaculty(changedStudent));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Student> removeStudent(@PathVariable long id) { //delete
-        if (studentService.getAll().values() != null) {
-            return ResponseEntity.ok(studentService.removeStudentFromStudentMapAtFaculty(id));
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }
+
 
